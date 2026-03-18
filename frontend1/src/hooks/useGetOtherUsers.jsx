@@ -11,7 +11,7 @@ const useGetOtherUsers = () => {
             try {
                 axios.defaults.withCredentials = true;
                 // Fix 1: Use the full URL directly if BASE_URL isn't defined
-                const res = await axios.get(`http://localhost:8080/api/v1/user/`);
+                const res = await axios.get(`http://localhost:8081/api/v1/user/`);
                 
                 // Debugging: Open your browser console (F12) and look at this!
                 console.log("API FULL RESPONSE:", res);

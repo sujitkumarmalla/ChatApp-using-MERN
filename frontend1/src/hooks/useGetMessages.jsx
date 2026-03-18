@@ -15,7 +15,7 @@ const useGetMessages = () => {
       try {
         axios.defaults.withCredentials = true;
         const res = await axios.get(
-          `http://localhost:8080/api/v1/message/${selectedUser._id}`
+          `http://localhost:8081/api/v1/message/${selectedUser._id}`
         );
 
         console.log("Messages Received:", res.data); // DEBUG: Check what the backend sends
@@ -24,6 +24,21 @@ const useGetMessages = () => {
         const messageData = Array.isArray(res.data) ? res.data : res.data?.messages;
         
         dispatch(setMessages(messageData || []));
+
+        // 3. Mark all loaded messages from the other user as seen
+        if (messageData && messageData.length > 0) {
+            import("../redux/store").then((storeModule) => {
+                const state = storeModule.default.getState();
+                const socket = state.socket.socket;
+                if (socket) {
+                    messageData.forEach((msg) => {
+                        if (msg.senderId === selectedUser._id && msg.status !== 'seen') {
+                            socket.emit("markSeen", { messageId: msg._id, senderId: msg.senderId });
+                        }
+                    });
+                }
+            });
+        }
       } catch (error) {
         console.error("Error fetching messages:", error);
       }

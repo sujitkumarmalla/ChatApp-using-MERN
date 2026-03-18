@@ -3,6 +3,7 @@ import { IoSendSharp } from "react-icons/io5";
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { setMessages } from '../redux/messageSlice'; // Import your action
+import { moveUserToTop } from '../redux/userSlice';
 
 const Sendinput = () => {
 
@@ -12,6 +13,23 @@ const Sendinput = () => {
     // FIX 1: Destructure to get the actual user object
     const { selectedUser } = useSelector(store => store.user);
     const { messages } = useSelector(store => store.message);
+    const { socket } = useSelector(store => store.socket);
+
+    // Track the timeout ID for stopTyping
+    const [typingTimeoutId, setTypingTimeoutId] = useState(null);
+
+    const onChangeHandler = (e) => {
+        setMessage(e.target.value);
+        if (socket && selectedUser) {
+            socket.emit("typing", selectedUser._id);
+            if (typingTimeoutId) clearTimeout(typingTimeoutId);
+            
+            const timeoutId = setTimeout(() => {
+                socket.emit("stopTyping", selectedUser._id);
+            }, 2000);
+            setTypingTimeoutId(timeoutId);
+        }
+    };
 
     const onSubmitHandler = async (e) => {
         e.preventDefault();
@@ -19,7 +37,7 @@ const Sendinput = () => {
 
         try {
             const res = await axios.post(
-                `http://localhost:8080/api/v1/message/send/${selectedUser?._id}`, 
+                `http://localhost:8081/api/v1/message/send/${selectedUser?._id}`, 
                 { message }, 
                 {
                     headers: { "Content-Type": "application/json" },
@@ -30,11 +48,17 @@ const Sendinput = () => {
             console.log("Message sent response:", res.data);
 
             // FIX 2: Update Redux store immediately so the message appears on screen
-            // We take the existing messages and add the new one from the response
-            dispatch(setMessages([...messages, res.data.newMessage])); 
+            // res.data is the message object itself.
+            dispatch(setMessages([...messages, res.data])); 
+            dispatch(moveUserToTop(selectedUser?._id));
             
             // Clear input after sending
             setMessage(""); 
+            
+            if (socket && selectedUser) {
+                socket.emit("stopTyping", selectedUser._id);
+                if (typingTimeoutId) clearTimeout(typingTimeoutId);
+            }
 
         } catch (error) {
             console.log("Error sending message:", error);
@@ -42,17 +66,17 @@ const Sendinput = () => {
     }
 
     return (
-        <form onSubmit={onSubmitHandler} className='px-4 my-3'>
-            <div className='w-full relative'>
+        <form onSubmit={onSubmitHandler} className='px-4 py-3 bg-[#202C33]'>
+            <div className='w-full relative flex items-center gap-3'>
                 <input 
                     type="text" 
-                    placeholder='Send a message...' 
+                    placeholder='Type a message' 
                     value={message} 
-                    onChange={(e) => setMessage(e.target.value)}
-                    className='border text-sm rounded-lg block w-full bg-gray-700 p-3 border-zinc-500 text-white' 
+                    onChange={onChangeHandler}
+                    className='w-full bg-[#2A3942] text-[#D1D7DB] placeholder-[#8696A0] px-4 py-[10px] rounded-lg focus:outline-none' 
                 />
-                <button type="submit" className='absolute inset-y-0 end-0 flex items-center pr-4 text-white hover:text-blue-500'>
-                    <IoSendSharp />
+                <button type="submit" className='text-[#8696A0] hover:text-[#D1D7DB] shrink-0 p-1'>
+                    <IoSendSharp size={24} />
                 </button>
             </div>
         </form>

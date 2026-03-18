@@ -18,7 +18,7 @@ const OtherUsers = () => {
     if (!otherUsers) return <div className='text-white p-4'>Loading...</div>;
      
     return (
-        <div className='overflow-auto flex-1'>
+        <div className='overflow-y-auto flex-1 bg-[#111B21] custom-scrollbar'>
             {
                 otherUsers.length > 0 ? (
                     otherUsers.map((user) => (
