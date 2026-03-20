@@ -36,7 +36,7 @@ export const register = async (req, res) => {
     // Profile photo handling
     let profilePhotoUrl = "";
     if (req.file) {
-      profilePhotoUrl = `http://localhost:8081/uploads/${req.file.filename}`;
+      profilePhotoUrl = `/uploads/${req.file.filename}`;
     } else {
       const maleProfilephoto = `https://avatar.iran.liara.run/public/boy?username=${username}`;
       const femaleProfilephoto = `https://avatar.iran.liara.run/public/girl?username=${username}`;
@@ -151,7 +151,7 @@ export const updateProfilePhoto = async (req, res) => {
       return res.status(400).json({ message: "No photo uploaded", success: false });
     }
 
-    const photoUrl = `http://localhost:8081/uploads/${req.file.filename}`;
+    const photoUrl = `/uploads/${req.file.filename}`;
 
     const user = await User.findByIdAndUpdate(
       userId,
