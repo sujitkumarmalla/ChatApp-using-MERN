@@ -1,4 +1,10 @@
 {
+  "name": "chat-app-deployment",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npm install --prefix backend2 && npm install --prefix frontend1 && npm run build --prefix frontend1",
+    "start": "npm start --prefix backend2"
+  },
   "dependencies": {
     "socket.io-client": "^4.8.3"
   }

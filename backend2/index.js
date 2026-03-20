@@ -4,9 +4,9 @@ import conncetDB from "./config/database.js";
 import userRoute from "./routes/userRoutes.js"
 import cookieParser from "cookie-parser";
 import messageRoute from "./routes/messageRoute.js"
-import cors from "cors"
-
-// 1. IMPORT app and server from your socket.js
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";// 1. IMPORT app and server from your socket.js
 import { app, server } from "./socket/socket.js";
 
 dotenv.config();
@@ -33,6 +33,16 @@ app.use(cors(corsOption));
 // Routes
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/message", messageRoute);
+
+// Configure Static serving for Render deployment
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.static(path.join(__dirname, "../frontend1/dist")));
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend1", "dist", "index.html"));
+});
 
 // 2. IMPORTANT: Change app.listen to server.listen
 server.listen(PORT, () => {
