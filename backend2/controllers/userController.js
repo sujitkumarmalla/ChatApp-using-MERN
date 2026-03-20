@@ -1,6 +1,8 @@
 import { User } from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import cloudinary from "../utils/cloudinary.js";
+import fs from "fs";
 
 //register
 export const register = async (req, res) => {
@@ -36,7 +38,17 @@ export const register = async (req, res) => {
     // Profile photo handling
     let profilePhotoUrl = "";
     if (req.file) {
-      profilePhotoUrl = `/uploads/${req.file.filename}`;
+      try {
+        const uploadResponse = await cloudinary.uploader.upload(req.file.path, {
+          folder: "chat_app_profiles"
+        });
+        profilePhotoUrl = uploadResponse.secure_url;
+        // Delete the local file after uploading to Cloudinary
+        fs.unlinkSync(req.file.path);
+      } catch (error) {
+        console.error("Cloudinary Error:", error);
+        return res.status(500).json({ message: "Cloudinary image upload failed" });
+      }
     } else {
       const maleProfilephoto = `https://avatar.iran.liara.run/public/boy?username=${username}`;
       const femaleProfilephoto = `https://avatar.iran.liara.run/public/girl?username=${username}`;
@@ -151,7 +163,18 @@ export const updateProfilePhoto = async (req, res) => {
       return res.status(400).json({ message: "No photo uploaded", success: false });
     }
 
-    const photoUrl = `/uploads/${req.file.filename}`;
+    let photoUrl = "";
+    try {
+      const uploadResponse = await cloudinary.uploader.upload(req.file.path, {
+        folder: "chat_app_profiles"
+      });
+      photoUrl = uploadResponse.secure_url;
+      // Delete the local file after uploading to Cloudinary
+      fs.unlinkSync(req.file.path);
+    } catch (uploadError) {
+      console.error("Cloudinary Error:", uploadError);
+      return res.status(500).json({ message: "Cloudinary image upload failed" });
+    }
 
     const user = await User.findByIdAndUpdate(
       userId,
