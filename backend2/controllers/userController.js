@@ -1,6 +1,7 @@
 import { User } from "../models/userModel.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
+
 //register
 export const register = async (req, res) => {
   try {
@@ -32,17 +33,22 @@ export const register = async (req, res) => {
     // Hash password
     const hashPassword = await bcrypt.hash(password, 10);
 
-    // Profile photo URLs
-    const maleProfilephoto = `https://avatar.iran.liara.run/public/boy?username=${username}`;
-    const femaleProfilephoto = `https://avatar.iran.liara.run/public/girl?username=${username}`;
+    // Profile photo handling
+    let profilePhotoUrl = "";
+    if (req.file) {
+      profilePhotoUrl = `http://localhost:8081/uploads/${req.file.filename}`;
+    } else {
+      const maleProfilephoto = `https://avatar.iran.liara.run/public/boy?username=${username}`;
+      const femaleProfilephoto = `https://avatar.iran.liara.run/public/girl?username=${username}`;
+      profilePhotoUrl = gender === "male" ? maleProfilephoto : femaleProfilephoto;
+    }
 
     // Create user
     await User.create({
       fullName,
       username,
       password: hashPassword,
-      profilePhoto:
-        gender === "male" ? maleProfilephoto : femaleProfilephoto,
+      profilePhoto: profilePhotoUrl,
       gender
     });
 
@@ -133,6 +139,35 @@ export const getOtherUser = async (req, res) => {
     console.error(error);
     return res.status(500).json({
       message: "Something went wrong",
+      success: false
+    });
+  }
+};
+
+export const updateProfilePhoto = async (req, res) => {
+  try {
+    const userId = req.id;
+    if (!req.file) {
+      return res.status(400).json({ message: "No photo uploaded", success: false });
+    }
+
+    const photoUrl = `http://localhost:8081/uploads/${req.file.filename}`;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { profilePhoto: photoUrl },
+      { new: true }
+    ).select("-password");
+
+    return res.status(200).json({
+      message: "Profile photo updated successfully",
+      success: true,
+      user
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal server error",
       success: false
     });
   }

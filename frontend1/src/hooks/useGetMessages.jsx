@@ -2,9 +2,11 @@ import { useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setMessages } from "../redux/messageSlice";
+import { useSocket } from "../context/SocketContext";
 
 const useGetMessages = () => {
   const { selectedUser } = useSelector((store) => store.user);
+  const { socket } = useSocket();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -26,16 +28,10 @@ const useGetMessages = () => {
         dispatch(setMessages(messageData || []));
 
         // 3. Mark all loaded messages from the other user as seen
-        if (messageData && messageData.length > 0) {
-            import("../redux/store").then((storeModule) => {
-                const state = storeModule.default.getState();
-                const socket = state.socket.socket;
-                if (socket) {
-                    messageData.forEach((msg) => {
-                        if (msg.senderId === selectedUser._id && msg.status !== 'seen') {
-                            socket.emit("markSeen", { messageId: msg._id, senderId: msg.senderId });
-                        }
-                    });
+        if (messageData && messageData.length > 0 && socket) {
+            messageData.forEach((msg) => {
+                if (msg.senderId === selectedUser._id && msg.status !== 'seen') {
+                    socket.emit("markSeen", { messageId: msg._id, senderId: msg.senderId });
                 }
             });
         }
@@ -45,7 +41,7 @@ const useGetMessages = () => {
     };
 
     fetchMessages();
-  }, [selectedUser?._id, dispatch]); // Only run when the ID changes
+  }, [selectedUser?._id, dispatch, socket]); // Added socket dependency so it marks seen reliably
 };
 
 export default useGetMessages;

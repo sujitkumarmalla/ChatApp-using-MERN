@@ -2,9 +2,13 @@ import React from "react";
 import Sidebar from "./Sidebar";
 import MessageContainer from "./MessageContainer";
 import { useSelector } from "react-redux";
+import useGetRealTimeMessage from "../hooks/useGetRealtimeMessage";
 
 const Homepage = () => {
     const { selectedUser } = useSelector(store => store.user);
+    
+    // 🔥 ALWAYS ACTIVE: Listens to sockets globally so messages don't drop
+    useGetRealTimeMessage();
 
     return (
         <div className="flex h-full w-full bg-[#111B21] overflow-hidden sm:p-0 md:p-4 lg:p-6 justify-center">

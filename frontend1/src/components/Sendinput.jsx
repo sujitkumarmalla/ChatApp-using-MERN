@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { IoSendSharp } from "react-icons/io5";
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { setMessages } from '../redux/messageSlice'; // Import your action
+import { addMessage } from '../redux/messageSlice'; // Import your action
 import { moveUserToTop } from '../redux/userSlice';
+import { useSocket } from '../context/SocketContext';
 
 const Sendinput = () => {
 
@@ -12,8 +13,7 @@ const Sendinput = () => {
     
     // FIX 1: Destructure to get the actual user object
     const { selectedUser } = useSelector(store => store.user);
-    const { messages } = useSelector(store => store.message);
-    const { socket } = useSelector(store => store.socket);
+    const { socket } = useSocket();
 
     // Track the timeout ID for stopTyping
     const [typingTimeoutId, setTypingTimeoutId] = useState(null);
@@ -49,7 +49,7 @@ const Sendinput = () => {
 
             // FIX 2: Update Redux store immediately so the message appears on screen
             // res.data is the message object itself.
-            dispatch(setMessages([...messages, res.data])); 
+            dispatch(addMessage(res.data)); 
             dispatch(moveUserToTop(selectedUser?._id));
             
             // Clear input after sending

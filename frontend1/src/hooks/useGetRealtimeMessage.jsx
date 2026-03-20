@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setMessages, updateMessageStatus } from "../redux/messageSlice";
+import { addMessage, updateMessageStatus } from "../redux/messageSlice";
 import { addTypingUser, removeTypingUser, moveUserToTop, incrementUnread } from "../redux/userSlice";
+import { useSocket } from "../context/SocketContext";
 
 const useGetRealTimeMessage = () => {
-  const { socket } = useSelector((store) => store.socket);
-  const { messages } = useSelector((store) => store.message);
+  const { socket } = useSocket();
   const dispatch = useDispatch();
 
   const { selectedUser } = useSelector((store) => store.user);
@@ -14,7 +14,7 @@ const useGetRealTimeMessage = () => {
     socket?.on("newMessage", (newMessage) => {
       if (newMessage.senderId === selectedUser?._id) {
         // The sender is the actively selected user.
-        dispatch(setMessages([...messages, newMessage]));
+        dispatch(addMessage(newMessage));
         socket.emit("markSeen", { messageId: newMessage._id, senderId: newMessage.senderId });
       } else {
         // From someone else, mark delivered and increment unread badge
@@ -49,7 +49,7 @@ const useGetRealTimeMessage = () => {
       socket?.off("typing");
       socket?.off("stopTyping");
     };
-  }, [socket, messages, dispatch, selectedUser]);
+  }, [socket, dispatch, selectedUser]);
 };
 
 export default useGetRealTimeMessage;

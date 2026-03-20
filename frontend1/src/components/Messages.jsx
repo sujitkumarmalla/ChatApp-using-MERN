@@ -6,7 +6,6 @@ import useGetRealTimeMessage from '../hooks/useGetRealtimeMessage';
 
 const Messages = () => {
     useGetMessages();
-    useGetRealTimeMessage();
 
     const { messages } = useSelector(store => store.message);
     const { authUser, selectedUser } = useSelector(store => store.user); 

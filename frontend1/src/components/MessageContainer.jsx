@@ -50,7 +50,7 @@ const MessageContainer = () => {
                                     />
                                 </div>
                                 {isOnline && (
-                                    <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-blue-500 border-2 border-[#202C33] rounded-full"></span>
+                                    <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#00A884] border-2 border-[#202C33] rounded-full shadow-[0_0_8px_rgba(0,168,132,0.8)]"></span>
                                 )}
                             </div>
 

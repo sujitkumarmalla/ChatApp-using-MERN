@@ -29,7 +29,7 @@ const OtherUser = ({ user }) => {
                         <img src={getAvatar(user)} alt="user" className="w-full h-full object-cover" />
                     </div>
                     {isOnline && (
-                        <span className="absolute bottom-3 right-0 w-3.5 h-3.5 bg-blue-500 border-2 border-[#111B21] rounded-full"></span>
+                        <span className="absolute bottom-3 right-0 w-3.5 h-3.5 bg-[#00A884] border-2 border-[#111B21] rounded-full"></span>
                     )}
                 </div>
 

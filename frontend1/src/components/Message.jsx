@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { useSelector } from "react-redux";
 import { getAvatar } from '../utils/getAvtar';
+import { IoCheckmark, IoCheckmarkDone } from "react-icons/io5";
 
 const Message = ({ message }) => {
     const scroll = useRef();
@@ -26,8 +27,6 @@ const Message = ({ message }) => {
                 </div>
             </div>
             
-
-
             {/* Bubble - Right side is Green, Left side is Zinc */}
             <div className={`chat-bubble max-w-[85%] md:max-w-[70%] break-words shadow-sm text-[15px] leading-5 px-3 py-2 ${
                 isMe 
@@ -41,17 +40,16 @@ const Message = ({ message }) => {
                             {new Date(message?.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </time>
                         {isMe && (
-                            <span className="ml-1">
-                                {message.status === 'sent' && <span className="text-[#8696A0]">✓</span>}
-                                {message.status === 'delivered' && <span className="text-[#8696A0]">✓✓</span>}
-                                {message.status === 'seen' && <span className="text-[#53bdeb] font-bold">✓✓</span>}
+                            <span className="ml-[2px] text-[15px] flex items-center">
+                                {message.status === 'sent' && <IoCheckmark className="text-[#8696A0]" />}
+                                {message.status === 'delivered' && <IoCheckmarkDone className="text-[#8696A0]" />}
+                                {message.status === 'seen' && <IoCheckmarkDone className="text-[#53bdeb]" />}
                             </span>
                         )}
                     </div>
                 </div>
             </div>
             
-
         </div>
     )
 }
