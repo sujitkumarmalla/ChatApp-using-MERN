@@ -17,7 +17,8 @@ export const SocketProvider = ({ children }) => {
 
     useEffect(() => {
         if (authUser) {
-            const socketInstance = io("http://localhost:8081", {
+            const socketUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081' : '/';
+            const socketInstance = io(socketUrl, {
                 query: {
                     userId: authUser._id,
                 }

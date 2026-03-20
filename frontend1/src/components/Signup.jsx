@@ -51,7 +51,7 @@ const Signup = () => {
         formData.append("profilePhoto", profilePhoto);
       }
 
-      const res = await axios.post(`http://localhost:8081/api/v1/user/register`, formData, {
+      const res = await axios.post(`/api/v1/user/register`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

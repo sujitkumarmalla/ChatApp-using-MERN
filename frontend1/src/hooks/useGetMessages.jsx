@@ -17,7 +17,7 @@ const useGetMessages = () => {
       try {
         axios.defaults.withCredentials = true;
         const res = await axios.get(
-          `http://localhost:8081/api/v1/message/${selectedUser._id}`
+          `/api/v1/message/${selectedUser._id}`
         );
 
         console.log("Messages Received:", res.data); // DEBUG: Check what the backend sends

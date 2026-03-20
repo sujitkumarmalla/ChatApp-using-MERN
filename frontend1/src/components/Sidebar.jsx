@@ -27,7 +27,7 @@ const Sidebar = () => {
   const logoutHandler = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:8081/api/v1/user/logout"
+        "/api/v1/user/logout"
       );
       navigate("/login");
       toast.success(res.data.message);
@@ -79,7 +79,7 @@ const Sidebar = () => {
 
     const checkToastId = toast.loading("Uploading photo...");
     try {
-      const res = await axios.put("http://localhost:8081/api/v1/user/profile-photo", formData, {
+      const res = await axios.put("/api/v1/user/profile-photo", formData, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" }
       });
